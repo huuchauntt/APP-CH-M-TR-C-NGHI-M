@@ -1,0 +1,15 @@
+HƯỚNG DẪN CÀI ĐẶT APP CHẤM OMR (DÙNG CHUNG IPHONE & WINDOWS - CHẠY OFFLINE)
+
+1. Đưa thư mục này lên Vercel (hoặc GitHub Pages):
+   - Giải nén file OMR_HoTungMau_PWA.zip thành 1 thư mục.
+   - Kéo thả thư mục đó vào Vercel (https://vercel.com/new) để nhận đường link HTTPS cố định.
+
+2. Cài thành App trên iPhone:
+   - Mở đường link bằng trình duyệt Safari trên iPhone.
+   - Bấm nút Chia sẻ (ô vuông có mũi tên lên) -> chọn "Thêm vào Màn hình chính".
+   - Mở biểu tượng "Chấm OMR HTM" ngoài màn hình chính: chạy toàn màn hình, mở Camera Soi Live ổn định và hoạt động 100% offline.
+
+3. Cài thành App trên máy tính Windows:
+   - Mở đường link bằng Microsoft Edge hoặc Google Chrome.
+   - Bấm biểu tượng "Cài đặt ứng dụng" ở góc phải thanh địa chỉ -> chọn Cài đặt.
+   - Ứng dụng sẽ có biểu tượng riêng ngoài Desktop / Start Menu và chạy offline hoàn toàn.
