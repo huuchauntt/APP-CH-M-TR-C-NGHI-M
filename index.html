@@ -3520,18 +3520,27 @@
       const sess = getActiveSession();
       const sessKeys = getActiveSessionAnswerKeys();
       if (!sessKeys[code]) sessKeys[code] = createBlankDefaultKeysForCode();
-      const kd = sessKeys[code];
-      kd.p1ScoreEach = parseFloat(document.getElementById('inputScoreEachP1').value) || 0.25;
-      kd.p2Mode = document.getElementById('selectScoreModeP2').value;
-      kd.p3ScoreEach = parseFloat(document.getElementById('inputScoreEachP3').value) || 0.25;
-      kd.p4ScoreEach = parseFloat(document.getElementById('inputScoreEachP4').value) || 0.25;
-      if (sess && markConfigured) {
-        sess.keysConfigured = true;
+      const p1Score = parseFloat(document.getElementById('inputScoreEachP1').value) || 0.25;
+      const p2Mode = document.getElementById('selectScoreModeP2').value || 'equal';
+      const p3Score = parseFloat(document.getElementById('inputScoreEachP3').value) || 0.25;
+      const p4Score = parseFloat(document.getElementById('inputScoreEachP4').value) || 0.25;
+
+      // Áp dụng chung barem điểm cho TẤT CẢ mã đề thuộc (đợt chấm + mẫu phiếu) hiện tại
+      Object.keys(sessKeys).forEach(k => {
+        if (!k || !sessKeys[k]) return;
+        sessKeys[k].p1ScoreEach = p1Score;
+        sessKeys[k].p2Mode = p2Mode;
+        sessKeys[k].p3ScoreEach = p3Score;
+        sessKeys[k].p4ScoreEach = p4Score;
+      });
+      if (sess) {
+        const tid = sess.templateId || 'tmpl_htm_4parts';
+        if (!sess.scoringByTemplate) sess.scoringByTemplate = {};
+        sess.scoringByTemplate[tid] = { p1ScoreEach: p1Score, p2Mode, p3ScoreEach: p3Score, p4ScoreEach: p4Score };
+        if (markConfigured) sess.keysConfigured = true;
       }
-      try {
-        localStorage.setItem('omr_grader_sessions_v2', JSON.stringify(appState.sessions));
-        localStorage.setItem('omr_grader_active_exam_code', code);
-      } catch (e) {}
+      persistSessionsState();
+      try { localStorage.setItem('omr_grader_active_exam_code', code); } catch (e) {}
       updateKeyConfigWarningUI();
     }
 
@@ -4221,7 +4230,17 @@
         const c = inp.value.trim(); if (!c) { showToast('Nhập tên mã đề mới vào ô bên cạnh!', false); return; }
         const sk = getActiveSessionAnswerKeys();
         if (sk[c]) { showToast(`Mã đề ${c} đã tồn tại trong đợt này!`, false); return; }
-        sk[c] = createBlankDefaultKeysForCode();
+        const newKd = createBlankDefaultKeysForCode();
+        const curSess = getActiveSession();
+        const tid = curSess ? (curSess.templateId || 'tmpl_htm_4parts') : 'tmpl_htm_4parts';
+        const sharedScore = curSess && curSess.scoringByTemplate && curSess.scoringByTemplate[tid];
+        if (sharedScore) {
+          newKd.p1ScoreEach = sharedScore.p1ScoreEach;
+          newKd.p2Mode = sharedScore.p2Mode;
+          newKd.p3ScoreEach = sharedScore.p3ScoreEach;
+          newKd.p4ScoreEach = sharedScore.p4ScoreEach;
+        }
+        sk[c] = newKd;
         autoSaveCurrentExamKeyConfig(c, false); inp.value = '';
         renderConfigExamCodeDropdown(c); renderKeySettings(c);
         showToast(`Đã thêm Mã đề ${c} cho đợt hiện tại!`, true);
